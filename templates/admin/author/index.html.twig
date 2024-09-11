@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste d'auteurs{% endblock %}
+
+{% block body %}
+<section class="container px-4">
+    <h1>Liste d'auteurs</h1>
+    <ul class="list-group list-group-flush"> 
+        {% for author in authors %}
+            <div class="card text-white mb-1" style="background-color: #1b1e1f">
+                <div class="card-body">
+                    <div class="card-title d-flex justify-content-between">
+                        <li class="list-group-item text-white" style="background-color: #1b1e1f">
+                            <a href="{{ path('app_admin_author_show', {id: author.id}) }}" class="streched-link">
+                                <h4 class="mb-1">{{ author.name }}</h4>
+                            </a>
+                            <small class="text-muted">Identifiant : {{ author.id }}</small>
+                        </li>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <li class="list-group-item text-white" style="background-color: #1b1e1f">Aucun enregistrement en base de donnéees.</li>
+        {% endfor %}
+    </ul>
+    {{ pagerfanta(authors) }}
+</section>
+{% endblock %}
