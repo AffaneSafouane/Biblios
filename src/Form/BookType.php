@@ -56,7 +56,7 @@ class BookType extends AbstractType
                 'attr' => ['style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'],
                 'choice_label' => 'name',
             ])
-            ->add('author', EntityType::class, [
+            ->add('authors', EntityType::class, [
                 'class' => Author::class,
                 'attr' => ['style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'],
                 'choice_label' => 'name',

@@ -19,7 +19,7 @@
                         <li class="list-group-item text-white" style="background-color: #1b1e1f">
                             <h5>Auteur : </h5>
                             <ul class="list-group list-group-flush">
-                                {% for author in book.author %}
+                                {% for author in book.authors %}
                                     <a href="{{ path('app_admin_author_show', {id: author.id}) }}">{{ author.name }}</a>
                                 {% else %}
                                     <li class="list-group-item text-white" style="background-color: #1b1e1f">Pas d'auteur connu</li>

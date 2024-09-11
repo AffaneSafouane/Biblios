@@ -42,6 +42,7 @@ final class BookFactory extends PersistentProxyObjectFactory
             'plot' => self::faker()->text(),
             'status' => self::faker()->randomElement(BookStatus::cases()),
             'title' => self::faker()->unique()->sentence(),
+            'createdBy' => UserFactory::random(),
         ];
     }
 

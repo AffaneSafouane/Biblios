@@ -20,30 +20,15 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 #[Route('/admin/user')]
 class RegistrationController extends AbstractController
 {
-    // public function __construct(private EmailVerifier $emailVerifier)
-    // {
-    // }
-
-    #[Route('/{id}', name: 'app_admin_user_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show(?User $user): Response
+    public function __construct(private EmailVerifier $emailVerifier)
     {
-        $user = $this->getUser();
-
-        return $this->render('admin/registration/show.html.twig', [
-            'user' => $user,
-        ]);
     }
 
     #[IsGranted("ROLE_ADMIN")]
-    #[Route('/new', name: 'app_admin_user_new', methods: ['GET', 'POST'])]
-    #[Route('/edit', name: 'app_admin_user_edit', methods: ['GET', 'POST'])]
-    public function register(?User $user, Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'app_admin_register', methods: ['GET', 'POST'])]
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
-        if ($user) {
-            $this->denyAccessUnlessGranted("user.email", $user);
-        }
-
-        $user ??= new User();
+        $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
@@ -60,13 +45,13 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // generate a signed url and email it to the user
-            // $this->emailVerifier->sendEmailConfirmation('app_admin_verify_email', $user,
-            //     (new TemplatedEmail())
-            //         ->from(new Address('safouane200403@hotmail.com', 'Saf & Co.'))
-            //         ->to($user->getEmail())
-            //         ->subject('Please Confirm your Email')
-            //         ->htmlTemplate('admin/registration/confirmation_email.html.twig')
-            // );
+            $this->emailVerifier->sendEmailConfirmation('app_admin_verify_email', $user,
+                (new TemplatedEmail())
+                    ->from(new Address('safouane200403@hotmail.com', 'Saf & Co.'))
+                    ->to($user->getEmail())
+                    ->subject('Please Confirm your Email')
+                    ->htmlTemplate('admin/registration/confirmation_email.html.twig')
+            );
 
             // do anything else you need here, like send an email
 
@@ -78,23 +63,23 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    // #[Route('/verify/email', name: 'app_admin_verify_email')]
-    // public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
-    // {
-    //     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    #[Route('/verify/email', name: 'app_admin_verify_email')]
+    public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-    //     // validate email confirmation link, sets User::isVerified=true and persists
-    //     try {
-    //         $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
-    //     } catch (VerifyEmailExceptionInterface $exception) {
-    //         $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+        // validate email confirmation link, sets User::isVerified=true and persists
+        try {
+            $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
+        } catch (VerifyEmailExceptionInterface $exception) {
+            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
-    //         return $this->redirectToRoute('app_admin_user_new');
-    //     }
+            return $this->redirectToRoute('app_admin_user_new');
+        }
 
-    //     // @TODO Change the redirect on success and handle or remove the flash message in your templates
-    //     $this->addFlash('success', 'Your email address has been verified.');
+        // @TODO Change the redirect on success and handle or remove the flash message in your templates
+        $this->addFlash('success', 'Your email address has been verified.');
 
-    //     return $this->redirectToRoute('app_admin_user_new');
-    // }
+        return $this->redirectToRoute('app_admin_user_new');
+    }
 }

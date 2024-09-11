@@ -65,6 +65,10 @@ class Book
     #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books', cascade: ['persist'])]
     private Collection $authors;
 
+    #[ORM\ManyToOne()]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
+
     public function __construct()
     {
         $this->comment = new ArrayCollection();
@@ -225,6 +229,17 @@ class Book
         if ($this->authors->removeElement($author)) {
             $author->removeBook($this);
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

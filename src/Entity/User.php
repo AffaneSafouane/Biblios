@@ -46,8 +46,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank()]
     private ?string $lastname = null;
 
-    // #[ORM\Column]
-    // private ?bool $isVerified = null;
+    #[ORM\Column]
+    private ?bool $isVerified = null;
 
     #[ORM\Column(length: 255, unique: true)]
     #[Assert\Email()]
@@ -168,17 +168,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // public function getIsVerified(): ?bool
-    // {
-    //     return $this->isVerified;
-    // }
+    public function getIsVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
 
-    // public function setIsVerified(?bool $isVerified): static
-    // {
-    //     $this->isVerified = $isVerified;
+    public function setIsVerified(?bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     public function getLastConnectedAt(): ?\DateTimeImmutable
     {
