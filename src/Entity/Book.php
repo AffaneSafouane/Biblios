@@ -62,7 +62,7 @@ class Book
     /**
      * @var Collection<int, Author>
      */
-    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'book', cascade: ['persist'])]
+    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books', cascade: ['persist'])]
     private Collection $authors;
 
     public function __construct()
@@ -214,6 +214,7 @@ class Book
     {
         if (!$this->authors->contains($author)) {
             $this->authors->add($author);
+            $author->addBook($this);
         }
 
         return $this;

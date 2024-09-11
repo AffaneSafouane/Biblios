@@ -36,7 +36,7 @@ final class BookFactory extends PersistentProxyObjectFactory
             'cover' => self::faker()->imageUrl(330, 500, 'couverture'),
             'editedAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'editor' => EditorFactory::random(),
-            'authors' =>AuthorFactory::random(),
+            'authors' =>AuthorFactory::randomSet(self::faker()->numberBetween(1, 2)),
             'isbn' => self::faker()->isbn13(),
             'pageNumber' => self::faker()->randomNumber(),
             'plot' => self::faker()->text(),
