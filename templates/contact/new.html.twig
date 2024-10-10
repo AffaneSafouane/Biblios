@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nous Contacter{% endblock %}
+
+{% block body %}
+    <section class="container px-4">
+        <div class="w-50 m-auto">
+            <h1>Nous Contacter</h1>
+
+            {{ form_start(form) }}
+                {{ form_row(form.email, {label: '* Email'}) }}
+                {{ form_row(form.object, {label: '* Objet'}) }}
+                {{ form_row(form.message, {label: '* Message'}) }}
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+            {{ form_end(form) }}
+        </div>
+    </section>
+{% endblock %}

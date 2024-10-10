@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block body %}
+    <section class="container px-4">
+        <div class="d-flex justify-content-between">
+            <h1>Liste de commentaires :</h1>
+
+            <span class="align-content-center">
+                <a href="{{ path('app_book_show', {id: book.id}) }}" class="link">Retour</a>
+            </span>
+        </div>
+        {% for comment in comments %}
+            <div class="card mb-1 m-auto text-white" style="background-color: #1b1e1f">
+                <ul class="list-group list-group-flush">
+                    <div class="card-body" style="background-color: #1b1e1f">
+                        <div class="card-tite d-flex justify-content-between">
+                            <h4 class="mb-1">{{ comment.commentedBy.firstname }} {{ comment.commentedBy.lastname }}</h4>
+                            <small class="text-muted">Date de publication : {{ comment.publishedAt|date('d M Y - H:i') }}</small>
+                        </div>
+                        <div class="d-flex justify-content-between card-text">
+                            <p>{{ comment.content }}</p>
+                        </div>
+                        {% if app.user == comment.commentedBy %}
+                            <div class="row">
+                                <div class="col">
+                                    <a href="{{ path('app_comment_edit', {id: comment.id}) }}" class="btn btn-warning">Éditer</a>
+                                </div>
+                                <div class="col">
+                                    <form action="{{ url('app_comment_delete', {id: comment.id}) }}" method="POST" id="delete-form" class="float-end">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="token" value="{{ csrf_token('delete') }}">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </ul>
+            </div>
+            {% if app.user %}
+                <a href="{{ path('app_comment_new', {id: comment.book.id}) }}" class="btn btn-primary">Ajouter un commentaire</a>
+            {% endif %}
+        {% endfor %}
+    </section>
+    <script>
+        function confirmDelete() {
+            return confirm('Êtes vous sûr de vouloir supprimer les données ?')
+        }
+    </script>
+{% endblock %}

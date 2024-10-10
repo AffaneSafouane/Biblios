@@ -38,7 +38,7 @@ final class UserFactory extends PersistentProxyObjectFactory
             'firstname' => self::faker()->firstName(),
             'lastname' => self::faker()->lastName(),
             'password' => $this->hasher->hashPassword(new User(), 'abcd1234!'),
-            'roles' => [self::faker()->randomElement(['ROLE_AJOUT_DE_LIVRE', 'ROLE_EDITION_DE_LIVRE', 'ROLE_ADMIN'])],
+            'roles' => [self::faker()->randomElement(['ROLE_USER', 'ROLE_MODERATEUR', 'ROLE_AJOUT_DE_LIVRE', 'ROLE_EDITION_DE_LIVRE', 'ROLE_ADMIN'])],
             'isVerified' => self::faker()->boolean(50),
         ];
     }

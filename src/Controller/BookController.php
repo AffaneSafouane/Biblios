@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Book;
 use App\Repository\BookRepository;
+use App\Repository\CommentRepository;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,10 +30,15 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show(?Book $book): Response
+    public function show(Book $book, CommentRepository $commentRepository): Response
     {
+        $comments = $commentRepository->findByBook($book)
+                                        ->getQuery()
+                                        ->getResult();
+
         return $this->render('book/show.html.twig', [
             'book' => $book,
+            'comments' => $comments,
         ]);
     }
 }

@@ -45,8 +45,12 @@ class AuthorController extends AbstractController
     #[Route('/{id}/edit', name: 'app_admin_author_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function new(?Author $author, Request $request, EntityManagerInterface $manager): Response
     {
-        if (null === $author) {
-            $this->denyAccessUnlessGranted("ROLE_EDITION_DE_LIVRE");
+        if ($author) {
+            $this->denyAccessUnlessGranted("EDIT", $author);
+        }
+
+        if ($author === null) {
+            $this->denyAccessUnlessGranted("CREATE", $author);
         }
 
         $author ??= new Author();
@@ -63,6 +67,23 @@ class AuthorController extends AbstractController
         return $this->render('admin/author/new.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    #[IsGranted('ROLE_EDITION_DE_LIVRE')]
+    #[Route('/{id}/delete', name: "app_admin_author_delete", requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    public function delete(Author $author, Request $request, EntityManagerInterface $manager): Response
+    {
+        $this->denyAccessUnlessGranted("DELETE", $author);
+
+        /** @var string|null $token */
+        $token = $request->getPayload()->get('token');
+
+        if ($this->isCsrfTokenValid('delete', $token)) {
+            $manager->remove($author);
+            $manager->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_author_index');
     }
 
     #[Route('/{id}', name: 'app_admin_author_show', requirements: ['id' => '\d+'] , methods: ['GET'])]

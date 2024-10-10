@@ -32,13 +32,18 @@ final class CommentFactory extends PersistentProxyObjectFactory
      */
     protected function defaults(): array|callable
     {
+        $status = self::faker()->randomElement(CommentStatus::cases());
+
         return [
-            'book' => BookFactory::new(),
+            'book' => BookFactory::random(),
             'content' => self::faker()->text(),
+            'review' => self::faker()->randomFloat(2, 0, 5),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'email' => self::faker()->text(255),
-            'name' => self::faker()->text(255),
-            'status' => self::faker()->randomElement(CommentStatus::cases()),
+            'publishedAt' => $status === CommentStatus::Published
+                ? \DateTimeImmutable::createFromMutable(self::faker()->dateTime())
+                : null,
+            'commentedBy' => UserFactory::random(),
+            'status' => $status,
         ];
     }
 

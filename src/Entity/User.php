@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: "SEQUENCE")]
     #[ORM\Column]
     private ?int $id = null;
 
@@ -31,6 +31,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @var string The hashed password
+     * La contrainte Regex valide que le mot de passe :
+     * * contient au moins un chiffre
+     * * contient au moins une lettre en minuscule
+     * * contient au moins une lettre en majuscule
+     * * contient au moins un caractère spécial qui n'est pas un espace
+     * * fait entre 8 et 32 caractères de long.
      */
     #[ORM\Column]
     #[Assert\NotCompromisedPassword()]
@@ -46,7 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank()]
     private ?string $lastname = null;
 
-    #[ORM\Column]
+    #[ORM\Column(options: ["default" => false])]
     private ?bool $isVerified = null;
 
     #[ORM\Column(length: 255, unique: true)]
@@ -95,11 +101,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return array_unique ($roles);
     }
 
     /**
      * @param list<string> $roles
+     * @return User
      */
     public function setRoles(array $roles): static
     {

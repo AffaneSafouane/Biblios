@@ -3,29 +3,39 @@
 {% block title %}Détail d'un éditeur{% endblock %}
 
 {% block body %}
-<section class="container px-4">
-    <h1>Éditeur : </h1>
-    {% if editor is not null %}
-        <div class="card mb-1 m-auto text-white" style="background-color: #1b1e1f">
-            <div class="card-body">
-                <div class="card-title d-flex justify-content-between">
-                    <h4 class="mb-1">{{ editor.name }}</h4>
-                    <small class="text-muted">Identifiant : {{ editor.id }}</small>
+    <section class="container px-4">
+        <div class="d-flex justifiy-content-between">
+            <h1>Éditeur : </h1>
+            <span class="align-content-center"><a href="{{ path('app_admin_editor') }}" class="link">Retour</a></span>
+        </div>
+        {% if editor is not null %}
+            <div class="card mb-1 m-auto text-white" style="background-color: #1b1e1f">
+                <div class="card-body">
+                    <div class="card-title d-flex justify-content-between">
+                        <h4 class="mb-1">{{ editor.name }}</h4>
+                        <small class="text-muted">Identifiant : {{ editor.id }}</small>
+                    </div>
                 </div>
             </div>
+        {% else %}
+            <div>Éditeur non trouvé</div>
+        {% endif %}
+        <div class="row mb-3">
+            <div class="col">
+                <a href="{{ path('app_admin_editor_edit', {id: editor.id}) }}" class="btn btn-primary">Éditer</a>
+            </div>
+            <div class="col">
+                <form action="{{ url('app_admin_author_delete', {id: author.id}) }}" method="POST" id="delete-form" class="float-end">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="token" value="{{ csrf_token('delete') }}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">Supprimer</button>
+                </form>
+            </div>
         </div>
-    {% else %}
-        <div>Éditeur non trouvé</div>
-    {% endif %}
-    <div class="row mb-3">
-        <div class="col">
-            <a href="{{ path('app_admin_editor_edit', {id: editor.id}) }}" class="btn btn-primary">Éditer</a>
-        </div>
-        <div class="col">
-            <span class="float-end">
-                <a href="{{ path('app_admin_editor') }}" class="link">Retour</a>
-            </span>
-        </div>
-    </div>
-</section>
+    </section>
+    <script>
+        function confirmDelete() {
+            return confirm('Êtes vous sûr de vouloir supprimer les données ?')
+        }
+    </script>
 {% endblock %}

@@ -6,6 +6,7 @@ use App\Entity\Book;
 use App\Entity\User;
 use App\Form\BookType;
 use App\Repository\BookRepository;
+use App\Repository\CommentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -35,10 +36,14 @@ class BookController extends AbstractController
     #[IsGranted("ROLE_AJOUT_DE_LIVRE")]
     #[Route('/new', name: 'app_admin_book_new', methods: ['GET', 'POST'])]
     #[Route('/{id}/edit', name: 'app_admin_book_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function new(?Book $book, Request $request, EntityManagerInterface $manager)
+    public function new(?Book $book, Request $request, EntityManagerInterface $manager): Response
     {
         if ($book) {
-            $this->denyAccessUnlessGranted("ROLE_EDITION_DE_LIVRE");
+            $this->denyAccessUnlessGranted("EDIT", $book);
+        }
+
+        if ($book === null) {
+            $this->denyAccessUnlessGranted("CREATE", $book);
         }
 
         $book ??= new Book();
@@ -46,7 +51,11 @@ class BookController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+
             $user = $this->getUser();
+            if (!$book->getId() && $user instanceof User) {
+                $book->setCreatedBy($user);
+            }
 
             $manager->persist($book);
             $manager->flush();
@@ -59,11 +68,34 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_admin_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show(?Book $book): Response
+    #[IsGranted("ROLE_EDITION_DE_LIVRE")]
+    #[Route('/{id}/delete', name: "app_admin_book_delete", methods: ['DELETE'])]
+    public function delete(Book $book, EntityManagerInterface $manager, Request $request): Response
     {
+        $this->denyAccessUnlessGranted("DELETE", $book);
+
+        /** @var string|null $token */
+        $token = $request->getPayload()->get('token');
+
+        if ($this->isCsrfTokenValid('delete', $token)) {
+            $manager->remove($book);
+            $manager->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_book');
+    }
+
+    #[IsGranted("ROLE_MODERATOR")]
+    #[Route('/{id}', name: 'app_admin_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(?Book $book, CommentRepository $commentRepository): Response
+    {
+        $comments = $commentRepository->findByBook($book)
+                                    ->getQuery()
+                                    ->getResult();
+
         return $this->render('admin/book/show.html.twig', [
             'book' => $book,
+            'comments' => $comments,
         ]);
     }
 }

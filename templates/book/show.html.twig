@@ -29,11 +29,27 @@
                             <span>Status: {{ book.status.getLabel() }}</span>
 						</div>
 						<p class="lead">{{ book.plot }}</p>
-                        <div class="d-flex">
+                        <div class="d-flex mb-5">
                             <a href="{{ path('app_book') }}" class="btn btn-dark btn-outline-ligth flex-shrink-0">
                                 <i class="bi-cart-fill me-1">Retour à la liste</i>
                             </a>
                         </div>
+						<div>
+							<h2>Commentaire(s): </h2>
+							<ul class="list-group-item">
+								{% for comment in comments|slice(0, 2) %}
+									<li class="list-group-item text-white mb-3">{{ comment.content|nl2br }}</li>
+								{% else %}
+									<li class="list-group-item text-white mb-3">Aucun commentaires</li>
+									{% if app.user %}
+										<a href="{{ path('app_comment_new', {id: book.id}) }}" class="btn btn-primary">Ajouter un commentaire</a>
+									{% endif %}
+								{% endfor %}
+							</ul>
+							{% if comments|length > 0 %}
+								<a href="{{ path('app_comment_index', {id: book.id}) }}">Voir plus</a>
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>

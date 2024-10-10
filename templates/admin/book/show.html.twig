@@ -3,58 +3,81 @@
 {% block title %}Détail d'un livre{% endblock %}
 
 {% block body %}
-<section class="container px-4">
-    <h1>Livre : </h1>
-    {% if book is not null %}
-        <div class="card mb-1 m-auto text-white" style="background-color: #1b1e1f">
-            <div class="card-body">
-                <div class="card-title d-flex justify-content-between">
-                    <h4 class="mb-1">{{ book.title }}</h4>
-                    <small class="text-muted">Identifiant : {{ book.id }}</small>
-                </div>
-                <div class="d-flex justify-content-between card-text">
-                    <ul class="list-group list-group-flush">
-                            <li class="list-group-item text-white" style="background-color: #1b1e1f">Date d'édition : {{ book.editedAt|date('d M Y') }}</li>
-                            <li class="list-group-item text-white" style="background-color: #1b1e1f">ISBN : {{ book.isbn }}</li>
-                        <li class="list-group-item text-white" style="background-color: #1b1e1f">
-                            <h5>Auteur : </h5>
-                            <ul class="list-group list-group-flush">
-                                {% for author in book.authors %}
-                                    <a href="{{ path('app_admin_author_show', {id: author.id}) }}">{{ author.name }}</a>
-                                {% else %}
-                                    <li class="list-group-item text-white" style="background-color: #1b1e1f">Pas d'auteur connu</li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                        <li class="list-group-item text-white" style="background-color: #1b1e1f">
-                            <h5>Éditeur : </h5>
-                            <a href="{{ path('app_admin_editor_show', {id: book.editor.id}) }}">{{ book.editor.name }}</a>
-                        </li>
-                        <li class="list-group-item text-white" style="background-color: #1b1e1f">
-                            <h5>Créer par : </h5>
-                            <a href="{{ path('app_admin_editor_show', {id: book.createdBy.id}) }}">{{ book.createdBy.firstName }} {{ book.createdBy.lastname }}</a>
-                        </li>
-                        <li class="list-group-item text-white" style="background-color: #1b1e1f"><h5>Nombre de pages : </h5>{{ book.pageNumber }}</li>
-                        <li class="list-group-item text-white" style="background-color: #1b1e1f"><h5>Synopsis : </h5>{{ book.plot }}</li>
-                    </ul>
-                    <div>
-                        <img src="{{ book.cover }}" alt="Couverture de {{ book.title }}" class="img-fluid img-thumbnail" width="800px">
+    <section class="container px-4">
+        <div class="d-flex justify-content-between">
+            <h1>Livre :</h1>
+            <span class="align-content-center"><a href="{{ path('app_admin_book') }}" class="link">Retour</a></span>
+        </div>
+        {% if book is not null %}
+            <div class="card mb-1 m-auto text-white" style="background-color: #1b1e1f">
+                <div class="card-body">
+                    <div class="card-title d-flex justify-content-between">
+                        <h4 class="mb-1">{{ book.title }}</h4>
+                        <small class="text-muted">Identifiant : {{ book.id }}</small>
+                    </div>
+                    <div class="d-flex justify-content-between card-text">
+                        <ul class="list-group list-group-flush">
+                                <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray;">Date d'édition : {{ book.editedAt|date('d M Y') }}</li>
+                                <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray">ISBN : {{ book.isbn }}</li>
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray">
+                                <h5>Auteur : </h5>
+                                <ul class="list-group list-group-flush">
+                                    {% for author in book.authors %}
+                                        <a href="{{ path('app_admin_author_show', {id: author.id}) }}">{{ author.name }}</a>
+                                    {% else %}
+                                        <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray">Pas d'auteur connu</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray">
+                                <h5>Éditeur : </h5>
+                                <a href="{{ path('app_admin_editor_show', {id: book.editor.id}) }}">{{ book.editor.name }}</a>
+                            </li>
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray">
+                                <h5>Créer par : </h5>
+                                <span>{{ book.createdBy.firstName }} {{ book.createdBy.lastname }}</span>
+                            </li>
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray"><h5>Nombre de pages : </h5>{{ book.pageNumber }}</li>
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f; border-bottom: 1px solid gray"><h5>Synopsis : </h5>{{ book.plot }}</li>
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f">
+                                <h5>Commentaire(s) : </h5>
+                                <ul class="list-group list-group-flush">
+                                    {% for comment in comments|slice(0,2) %}
+                                        <li class="list-group-item text-white" style="background-color: #1b1e1f; border: none">{{ comment.content|nl2br }}</li>
+                                    {% else %}
+                                        <li class="list-group-item text-white" style="background-color: #1b1e1f">Aucun commentaires</li>
+                                    {% endfor %}
+                                </ul>
+                                {% if comments|length > 0 %}
+                                    <a href="{{ path('app_index_comment', {id: book.id}) }}">Voir plus</a>
+                                {% endif %}
+                            </li>
+                        </ul>
+                        <div>
+                            <img src="{{ book.cover }}" alt="Couverture de {{ book.title }}" class="img-fluid img-thumbnail" width="800px">
+                        </div>
                     </div>
                 </div>
             </div>
+        {% else %}
+            <div>Livre non trouvé</div>
+        {% endif %}
+        <div class="row mb-3">
+            <div class="col">
+                <a href="{{ path('app_admin_book_edit', {id: book.id}) }}" class="btn btn-warning">Éditer</a>
+            </div>
+            <div class="col">
+                <form action="{{ url('app_admin_book_delete', {id: book.id}) }}" method="POST" id="delete-form" class="float-end">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="token" value="{{ csrf_token('delete') }}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">Supprimer</button>
+                </form>
+            </div>
         </div>
-    {% else %}
-        <div>Livre non trouvé</div>
-    {% endif %}
-    <div class="row mb-3">
-        <div class="col">
-            <a href="{{ path('app_admin_book_edit', {id: book.id}) }}" class="btn btn-warning">Éditer</a>
-        </div>
-        <div class="col">
-            <span class="float-end">
-                <a href="{{ path('app_admin_book') }}" class="link">Retour</a>
-            </span>
-        </div>
-    </div>
-</section>
+    </section>
+    <script>
+        function confirmDelete() {
+            return confirm('Êtes vous sûr de vouloir supprimer les données ?');
+        }
+    </script>
 {% endblock %}

@@ -8,7 +8,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,35 +31,52 @@ class RegistrationFormType extends AbstractType
             ->add('username', TextType::class, [
                 'required' => false,
                 'attr' => ['style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;']
-            ]) 
+            ])
             ->add('email', EmailType::class, [
                 'attr' => ['style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;']
             ])
-            ->add('roles', ChoiceType::class, [
+            ->add('role', ChoiceType::class, [
                 'choices' => [
                     'Utilisateur-rice' => 'ROLE_USER',
+                    'Modérateur' => 'ROLE_MODERATEUR',
+                    'Ajout de livre' => 'ROLE_AJOUT_DE_LIVRE',
+                    'Édition de livre' => 'ROLE_EDITION_DE_LIVRE',
                     'Administrateur-rice' => 'ROLE_ADMIN',
                 ],
                 'multiple' => true,
                 'expanded' => true,
             ])
-            ->add('plainPassword', PasswordType::class, [
+            ->add('plainPassword', RepeatedType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
-                'mapped' => false,
-                'attr' => ['autocomplete' => 'new-password', 
-                'style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a password',
-                    ]),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
-                        // max length allowed by Symfony for security reasons
-                        'max' => 4096,
-                    ]),
+                'type' => PasswordType::class,
+                'first_options' => [
+                    'constraints' => [
+                        new NotBlank([
+                            'message' => 'Please enter a password',
+                        ]),
+                        new Length([
+                            'min' => 6,
+                            'minMessage' => 'Your password should be at least {{ limit }} characters',
+                            // max length allowed by Symfony for security reasons
+                            'max' => 4096,
+                        ]),
+                    ],
+                    'label' => '* Mot de passe',
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                        'style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'
+                    ],
                 ],
+                'second_options' => [
+                    'label' => '* Confirmez le mot de passe',
+                    'attr' => [
+                        'autocomplete' => 'same-password',
+                        'style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'
+                    ],
+                ],
+                'invalid_message' => 'Les mots de passe ne correspondent pas',
+                'mapped' => false,
             ])
         ;
     }

@@ -6,6 +6,7 @@ use App\Enum\CommentStatus;
 use App\Repository\CommentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
@@ -15,19 +16,29 @@ class Comment
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $commentedBy = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $email = null;
-
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $publishedAt = null;
 
+    #[Assert\NotBlank()]
+    #[Assert\Type(type: 'float')]
+    #[Assert\PositiveOrZero()]
+    #[Assert\Range(
+        notInRangeMessage: 'La note doit être comprise entre {{ min }} et {{ max }}.',
+        min: 0,
+        max: 5
+    )]
+    #[ORM\Column(nullable: true)]
+    private ?float $review = null;
+
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank()]
     private ?string $content = null;
 
     #[ORM\Column(length: 255)]
@@ -42,26 +53,14 @@ class Comment
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getCommentedBy(): ?User
     {
-        return $this->name;
+        return $this->commentedBy;
     }
 
-    public function setName(string $name): static
+    public function setCommentedBy(?User $commentedBy): static
     {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
+        $this->commentedBy = $commentedBy;
 
         return $this;
     }
@@ -98,6 +97,18 @@ class Comment
     public function setContent(string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getReview(): ?float
+    {
+        return $this->review;
+    }
+
+    public function setReview(?float $review): static
+    {
+        $this->review = $review;
 
         return $this;
     }

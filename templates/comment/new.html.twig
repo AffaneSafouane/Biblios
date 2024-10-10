@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% set action = app.current_route == 'app_comment_new' ? 'Ajout' : 'Édition' %}
+
+{% block title %}{{ action }} de commentaire{% endblock %}
+
+{% block body %}
+    <section class="container px-4">
+        <div class="w-50 m-auto">
+            <h1>{{ action }} de commentaire</h1>
+
+            {{ form_start(form) }}
+            {{ form_row(form.content, {label: 'Commentaire*'}) }}
+            {{ form_row(form.review, {label: 'Note'}) }}
+            {{ form_row(form.status, {label: 'Status*'}) }}
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+            {{ form_end(form) }}
+        </div>
+    </section>
+{% endblock %}

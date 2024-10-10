@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Factory\AuthorFactory;
 use App\Factory\BookFactory;
+use App\Factory\CommentFactory;
 use App\Factory\EditorFactory;
 use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -17,5 +18,6 @@ class AppFixtures extends Fixture
         EditorFactory::createMany(20);
         UserFactory::createMany(5);
         BookFactory::createMany(100);
+        CommentFactory::createMany(200);
     }
 }

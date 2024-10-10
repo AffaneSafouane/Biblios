@@ -4,9 +4,6 @@
 
 {% block body %}
     <section class="container px-4">
-        {% for flash_error in app.flashes('verify_email_error') %}
-            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-        {% endfor %}
         <div class="w-50 m-auto">
             <h1>Inscription</h1>
 
@@ -29,12 +26,10 @@
                 {{ form_row(registrationForm.roles, {
                     label: '* Rôles'
                 }) }}
-                {{ form_row(registrationForm.plainPassword, {
-                    label: '* Mot de Passe'
-                }) }}
+                {{ form_row(registrationForm.plainPassword) }}
 
                 <button type="submit" class="btn btn-primary">Inscription</button>
-        {{ form_end(registrationForm) }}
+            {{ form_end(registrationForm) }}
         </div>
     </section>
 {% endblock %}

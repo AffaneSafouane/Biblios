@@ -26,7 +26,6 @@ class EditorController extends AbstractController
             10
         );
 
-
         return $this->render('admin/editor/index.html.twig', [
             'editors' => $editors,
         ]);
@@ -37,9 +36,13 @@ class EditorController extends AbstractController
     #[Route('/{id}/edit', name: 'app_admin_editor_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]    
     public function new(?Editor $editor, Request $request, EntityManagerInterface $manager): Response
     {
-        if (null === $editor) {
-            $this->denyAccessUnlessGranted("ROLE_EDITION_DE_LIVRE");
-        } 
+        if ($editor) {
+            $this->denyAccessUnlessGranted("EDIT", $editor);
+        }
+
+        if ($editor === null) {
+            $this->denyAccessUnlessGranted("CREATE", $editor);
+        }
 
         $editor ??= new Editor();
         $form = $this->createForm(EditorType::class, $editor);
@@ -57,8 +60,25 @@ class EditorController extends AbstractController
         ]);
     }
 
+    #[IsGranted("ROLE_EDITION_DE_LIVRE")]
+    #[Route('/{id}/delete', name: "app_admin_editor_delete", methods: ['DELETE'])]
+    public function delete(Editor $editor, EntityManagerInterface $manager, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted("DELETE", $editor);
+
+        /** @var string|null $token */
+        $token = $request->getPayload()->get('token');
+
+        if ($this->isCsrfTokenValid('delete', $token)) {
+            $manager->remove($editor);
+            $manager->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_book');
+    }
+
     #[Route('/{id}', name: 'app_admin_editor_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show (?Editor $editor): Response
+    public function show (Editor $editor): Response
     {
         return $this->render('admin/editor/show.html.twig', [
             'editor' => $editor,
