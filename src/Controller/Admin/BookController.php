@@ -85,7 +85,7 @@ class BookController extends AbstractController
         return $this->redirectToRoute('app_admin_book');
     }
 
-    #[IsGranted("ROLE_MODERATOR")]
+    #[IsGranted("ROLE_MODERATEUR")]
     #[Route('/{id}', name: 'app_admin_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(?Book $book, CommentRepository $commentRepository): Response
     {

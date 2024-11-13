@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail de votre utilisateur{% endblock %}
+
+{% block body %}
+    <section class="container px-4">
+        <h1>Liste d'utilisateur : </h1>
+        <ul class="list-group list-group-flush">
+            {% for user in users %}
+                <div class="card text-white mb-1" style="background-color: #1b1e1f">                    <div class="card-body">
+                        <div class="card-title d-flex justify-content-between">
+                            <li class="list-group-item text-white" style="background-color: #1b1e1f">
+                                <a href="{{ path('app_admin_user_show', {id: user.id}) }}">
+                                    <h4 class="mb-1">{{ user.email }}</h4>
+                                </a>
+                                <small class="text-muted">Identifiant : {{ user.id }}</small>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div>Aucun utilisateurs enregistrés</div>
+            {% endfor %}
+        </ul>
+        {{ pagerfanta(users) }}
+    </section>
+{% endblock %}

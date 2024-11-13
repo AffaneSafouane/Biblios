@@ -25,10 +25,10 @@
                         {% if app.user == comment.commentedBy %}
                             <div class="row">
                                 <div class="col">
-                                    <a href="{{ path('app_comment_edit', {id: comment.id}) }}" class="btn btn-warning">Éditer</a>
+                                    <a href="{{ path('app_comment_edit', {book_id: book.id, comment_id: comment.id}) }}" class="btn btn-warning">Éditer</a>
                                 </div>
                                 <div class="col">
-                                    <form action="{{ url('app_comment_delete', {id: comment.id}) }}" method="POST" id="delete-form" class="float-end">
+                                    <form action="{{ url('app_comment_delete', {book_id: book.id, comment_id: comment.id}) }}" method="POST" id="delete-form" class="float-end">
                                         <input type="hidden" name="_method" value="DELETE">
                                         <input type="hidden" name="token" value="{{ csrf_token('delete') }}">
                                         <button type="submit" class="btn btn-danger" onclick="return confirmDelete()">Supprimer</button>
@@ -40,7 +40,7 @@
                 </ul>
             </div>
             {% if app.user %}
-                <a href="{{ path('app_comment_new', {id: comment.book.id}) }}" class="btn btn-primary">Ajouter un commentaire</a>
+                <a href="{{ path('app_comment_new', {book_id: book.id}) }}" class="btn btn-primary">Ajouter un commentaire</a>
             {% endif %}
         {% endfor %}
     </section>

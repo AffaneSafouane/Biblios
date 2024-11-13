@@ -45,7 +45,7 @@ class UserVoter extends Voter
 
         // ... (check conditions and return true to grant permission) ...
         return match ($attribute) {
-            self::EDIT, self::VIEW, self::DELETE => $subject instanceof User
+            self::VIEW, self::EDIT, self::DELETE => $subject instanceof User
                 && $user->getIsVerified() === true
                 && $user === $subject,
             self::LIST => $subject instanceof User

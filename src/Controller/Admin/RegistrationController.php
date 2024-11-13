@@ -3,7 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
+use App\Form\RegistrationType;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Security\Voter\UserVoter;
@@ -24,34 +25,35 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
-#[Route('/admin/user')]
+#[Route('admin/user')]
 class RegistrationController extends AbstractController
 {
     public function __construct(private readonly EmailVerifier $emailVerifier)
     {
     }
 
-    #[Route('/{id}/index', name: 'app_user_index', requirements: ['id' => '\d+'], methods: ['GET'])]
-    #[IsGranted(UserVoter::LIST)]
+    #[Route('/', name: 'app_admin_user_index', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function index(UserRepository $repository, Request $request): Response
     {
+        $this->denyAccessUnlessGranted("USER_LIST", $this->getUser());
+
         $users = Pagerfanta::createForCurrentPageWithMaxPerPage(
             new QueryAdapter($repository->createQueryBuilder('u')),
             $request->query->get('page', 1),
             20
         );
 
-        return $this->render('user/index.html.twig', [
-            'user' => $users,
+        return $this->render('/admin/user/index.html.twig', [
+            'users' => $users,
         ]);
     }
 
     #[IsGranted(UserVoter::CREATE)]
-    #[Route('/new', name: 'app_admin_register', methods: ['GET', 'POST'])]
+    #[Route('/register', name: 'app_admin_register', methods: ['GET', 'POST'])]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -76,39 +78,24 @@ class RegistrationController extends AbstractController
                     ->from(new Address('saf@demo.com'))
                     ->to($user->getEmail())
                     ->subject('Veuillez confirmer votre Email')
-                    ->htmlTemplate('admin/registration/confirmation_email.html.twig')
+                    ->htmlTemplate('admin/user/confirmation_email.html.twig')
             );
 
             return $this->redirectToRoute('app_main_index');
         }
 
-        return $this->render('admin/registration/register.html.twig', [
+        return $this->render('admin/user/register.html.twig', [
             'registrationForm' => $form,
         ]);
     }
 
-    #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request, TranslatorInterface $translator, TokenInterface $token): Response
+    #[Route('/{id}/show', name: 'app_admin_user_show', requirements: ['id'=>'\d+'], methods: ['GET'])]
+    public function show(User $user): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $user = $token->getUser();
+        $this->denyAccessUnlessGranted("USER_VIEW", $this->getUser());
 
-        if (!$user instanceof User) {
-            throw new AssetNotFoundException("User not found");
-        }
-
-        // validate email confirmation link, sets User::isVerified=true and persists
-        try {
-            $this->emailVerifier->handleEmailConfirmation($request, $user->getId());
-        } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
-
-            return $this->redirectToRoute('app_login');
-        }
-
-        // @TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
-
-        return $this->redirectToRoute('app_main_index');
+        return $this->render('admin/user/show.html.twig', [
+            'user' => $user,
+        ]);
     }
 }

@@ -49,7 +49,7 @@
                                     {% endfor %}
                                 </ul>
                                 {% if comments|length > 0 %}
-                                    <a href="{{ path('app_index_comment', {id: book.id}) }}">Voir plus</a>
+                                    <a href="{{ path('app_comment_index', {id: book.id}) }}">Voir plus</a>
                                 {% endif %}
                             </li>
                         </ul>

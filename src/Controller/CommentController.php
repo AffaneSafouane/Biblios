@@ -38,19 +38,12 @@ class CommentController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/new', name: 'app_comment_new', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    #[Route('/{id}/edit', name: 'app_comment_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function new(Book $book, ?Comment $comment, Request $request, EntityManagerInterface $manager): Response
+    #[Route('/{book_id}/new', name: 'app_comment_new', requirements: ['book_id' => '\d+'], methods: ['GET', 'POST'])]
+    public function new(Book $book, Request $request, EntityManagerInterface $manager): Response
     {
-        if ($comment) {
-            $this->denyAccessUnlessGranted('COMMENT_EDIT', $comment);
-        }
+        $this->denyAccessUnlessGranted('COMMENT_CREATE');
 
-        if ($comment === null) {
-            $this->denyAccessUnlessGranted('COMMENT_CREATE', $comment);
-        }
-
-        $comment ??= new Comment();
+        $comment = new Comment();
         $form = $this->createForm(CommentType::class, $comment, [
             'book' => $book,
         ]);
@@ -78,7 +71,42 @@ class CommentController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_comment_delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    #[Route('/{book_id}/edit/{comment_id}', name: 'app_comment_edit', requirements: ['book_id' => '\d+', 'comment_id' => '\d+'], methods: ['GET', 'POST'])]
+    public function edit(Book $book, int $comment_id, Request $request, EntityManagerInterface $manager): Response
+    {
+        $comment = $manager->getRepository(Comment::class)->find($comment_id);
+
+        if ($comment === null) {
+            throw $this->createNotFoundException('Comment not found');
+        }
+
+        $this->denyAccessUnlessGranted('COMMENT_EDIT', $comment);
+
+        $form = $this->createForm(CommentType::class, $comment, [
+            'book' => $book,
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($comment->getStatus() === "published") {
+                $comment->setPublishedAt(new \DateTimeImmutable());
+            } else {
+                $comment->setPublishedAt(null);
+            }
+
+            $manager->persist($comment);
+            $manager->flush();
+
+            return $this->redirectToRoute('app_comment_index', ['id' => $book->getId()]);
+        }
+
+        return $this->render('comment/new.html.twig', [
+            'form' => $form,
+            'comment' => $comment,
+        ]);
+    }
+
+    #[Route('/{book_id}/delete/{comment_id}', name: 'app_comment_delete', requirements: ['book_id' => '\d+', 'comment_id' => '\d+'], methods: ['DELETE'])]
     public function delete(Comment $comment, Request $request, EntityManagerInterface $manager): Response
     {
         $this->denyAccessUnlessGranted("COMMENT_DELETE", $comment);

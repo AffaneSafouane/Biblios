@@ -6,11 +6,8 @@
     <section class="container px-4">
         <div class="w-50 m-auto">
             <h1>Inscription</h1>
-
             {{ form_errors(registrationForm) }}
-
             {{ form_start(registrationForm) }}
-
                 {{ form_row(registrationForm.lastname, {
                     label: '* Nom de famille'
                 }) }}
@@ -24,10 +21,9 @@
                     label: '* Email'
                 }) }}
                 {{ form_row(registrationForm.roles, {
-                    label: '* Rôles'
+                label: '* Rôles'
                 }) }}
                 {{ form_row(registrationForm.plainPassword) }}
-
                 <button type="submit" class="btn btn-primary">Inscription</button>
             {{ form_end(registrationForm) }}
         </div>

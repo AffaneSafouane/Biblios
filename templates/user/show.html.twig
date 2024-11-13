@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails utilisateur{% endblock %}
+
+{% block body %}
+    <section class="container px-4">
+        {% if user is not null %}
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="row gx-4 gx-lg-5 align-items-center">
+                    {% for flash_error in app.flashes('success') %}
+                        <div class="alert alert-success" role="alert">{{ flash_error }}</div>
+                    {% endfor %}
+                    <div class="col-md-6">
+                        <img class="card-img-top mb-5 mb-md-0" src="#" alt="Photo de profil {{ user.firstname }} {{ user.lastname }}"/>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="fs-5">
+                            <span>Nom : {{ user.lastname }} {{ user.firstname }}</span>
+                        </div>
+                        <div class="fs-5">
+                            <span>Email : {{ user.email }}</span>
+                        </div>
+                        <div class="fs-5">
+                            <span>Dernière connexion : {{ user.lastConnectedAt|date('d M Y H:i:s') }}</span>
+                        </div>
+                        <div class="fs-5 mb-5">
+                            <span>Compte vérifié : {{ user.isVerified == 1 ? 'Vérifié' : 'Non vérifié' }}</span>
+                        </div>
+                        <div class="fs-5 mb-3">
+                            <h4>Roles :</h4>
+                            <ul class="list-group list-group-flush">
+                                {% for role in user.roles %}
+                                    <li class="list-group-item text-white" style="background-color: #1b1e1f; border: 1px solid gray">{{ role }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="d-flex mb-5">
+                            <a href="{{ path('app_main_index') }}" class="btn btn-dark btn-outline-ligth flex-shrink-0">
+                                <i class="bi-cart-fill me-1">Retour</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div>Utilisateur non trouvé</div>
+        {% endif %}
+    </section>
+{% endblock %}

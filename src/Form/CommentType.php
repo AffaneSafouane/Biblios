@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Entity\Book;
 use App\Entity\Comment;
 use App\Enum\CommentStatus;
-use Doctrine\DBAL\Types\FloatType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,7 +20,7 @@ class CommentType extends AbstractType
             ->add('content', TextAreaType::class, [
                 'attr' => ['style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'],
             ])
-            ->add('review', FloatType::class, [
+            ->add('review', IntegerType::class, [
                 'attr' => ['style' => 'background-color: #1b1e1f; color: white; border: 1px solid gray;'],
             ])
             ->add('status', EnumType::class, [
